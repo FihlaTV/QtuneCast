@@ -71,7 +71,7 @@ Version 2.x 基於 Clean Architecture, Android Architecture Components (ViewMode
 
 ## 開發者
 
-Dmitriy Krivoruchko - <dkrivoruchko@gmail.com>
+Dmitriy Krivoruchko - <fihlatv@gmail.com>
 
 如果有任何問題或點子歡迎來信談談。
 

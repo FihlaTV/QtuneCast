@@ -9,7 +9,7 @@ android {
     buildToolsVersion("30.0.2")
 
     defaultConfig {
-        applicationId = "info.dvkr.screenstream"
+        applicationId = "com.mvp.qtune"
         minSdkVersion(21)
         targetSdkVersion(30)
         versionCode = 30501

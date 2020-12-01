@@ -2,11 +2,11 @@
 # Screen Stream over HTTP
 An Android mobile app for viewing device screen in your web browser.
 
-[![xscode](https://img.shields.io/badge/Available%20on-xs%3Acode-blue?style=?style=plastic&logo=appveyor&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////////VXz1bAAAAAJ0Uk5T/wDltzBKAAAAlUlEQVR42uzXSwqAMAwE0Mn9L+3Ggtgkk35QwcnSJo9S+yGwM9DCooCbgn4YrJ4CIPUcQF7/XSBbx2TEz4sAZ2q1RAECBAiYBlCtvwN+KiYAlG7UDGj59MViT9hOwEqAhYCtAsUZvL6I6W8c2wcbd+LIWSCHSTeSAAECngN4xxIDSK9f4B9t377Wd7H5Nt7/Xz8eAgwAvesLRjYYPuUAAAAASUVORK5CYII=)](https://xscode.com/dkrivoruchko/ScreenStream) &nbsp; ![GitHub](https://img.shields.io/github/license/dkrivoruchko/ScreenStream) &nbsp; ![GitHub release (latest by date)](https://img.shields.io/github/v/release/dkrivoruchko/ScreenStream) 
+[![xscode](https://img.shields.io/badge/Available%20on-xs%3Acode-blue?style=?style=plastic&logo=appveyor&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////////VXz1bAAAAAJ0Uk5T/wDltzBKAAAAlUlEQVR42uzXSwqAMAwE0Mn9L+3Ggtgkk35QwcnSJo9S+yGwM9DCooCbgn4YrJ4CIPUcQF7/XSBbx2TEz4sAZ2q1RAECBAiYBlCtvwN+KiYAlG7UDGj59MViT9hOwEqAhYCtAsUZvL6I6W8c2wcbd+LIWSCHSTeSAAECngN4xxIDSK9f4B9t377Wd7H5Nt7/Xz8eAgwAvesLRjYYPuUAAAAASUVORK5CYII=)](https://xscode.com/FihlaTV/QtuneCast) &nbsp; ![GitHub](https://img.shields.io/github/license/FihlaTV/QtuneCast) &nbsp; ![GitHub release (latest by date)](https://img.shields.io/github/v/release/FihlaTV/QtuneCast) 
 
-[![Foo](https://xscode.com/assets/promo-banner.svg)](https://xscode.com/dkrivoruchko/ScreenStream)
+[![Foo](https://xscode.com/assets/promo-banner.svg)](https://xscode.com/FihlaTV/QtuneCast)
 
-> *Developed by [Dmitriy Krivoruchko](dkrivoruchko@gmail.com)* &middot; If there are any issues or ideas feel free to contact me.
+> *Developed by [Dmitriy Krivoruchko](FihlaTV@gmail.com)* &middot; If there are any issues or ideas feel free to contact me.
 ----
 
 The application allows viewing the device screen in your web browser. The main idea is to show your device screen during presentations and demos.
@@ -72,22 +72,22 @@ Version 3.x based on Clean Architecture, Single Activity and MVI patterns and us
 
 If you want to contribute with translation, you have to translate this 2 files:
 
-1. https://github.com/dkrivoruchko/ScreenStream/blob/master/app/src/main/res/values/strings.xml and
-2. https://github.com/dkrivoruchko/ScreenStream/blob/master/data/src/main/res/values/strings.xml
+1. https://github.com/FihlaTV/QtuneCast/blob/master/app/src/main/res/values/strings.xml and
+2. https://github.com/FihlaTV/QtuneCast/blob/master/data/src/main/res/values/strings.xml
 
-Then, please, [make a pull request](https://help.github.com/en/articles/creating-a-pull-request) or send those 2 files to the developer via e-mail <dkrivoruchko@gmail.com> as an attachment.
+Then, please, [make a pull request](https://help.github.com/en/articles/creating-a-pull-request) or send those 2 files to the developer via e-mail <FihlaTV@gmail.com> as an attachment.
 
 Your contribution is much appreciated. Thank you.
 
 ## Developed By
 
-Dmitriy Krivoruchko - <dkrivoruchko@gmail.com>
+Dmitriy Krivoruchko - <FihlaTV@gmail.com>
 
 If there are any issues or ideas feel free to contact me.
 
 ## Privacy Policy
 
-App [privacy policy](https://github.com/dkrivoruchko/ScreenStream/blob/master/PrivacyPolicy.md)
+App [privacy policy](https://github.com/FihlaTV/QtuneCast/blob/master/PrivacyPolicy.md)
 
 ## License
 

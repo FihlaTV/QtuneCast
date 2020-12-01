@@ -74,7 +74,7 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
                     val emailIntent = Intent(Intent.ACTION_SENDTO)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setData(Uri.Builder().scheme("mailto").build())
-                        .putExtra(Intent.EXTRA_EMAIL, arrayOf("Dmitriy Krivoruchko <dkrivoruchko@gmail.com>"))
+                        .putExtra(Intent.EXTRA_EMAIL, arrayOf("Dmitriy Krivoruchko <FihlaTV@gmail.com>"))
                         .putExtra(Intent.EXTRA_SUBJECT, "Screen Stream Feedback ($version)")
                     startActivity(
                         Intent.createChooser(emailIntent, getString(R.string.about_fragment_email_chooser_header))
@@ -88,7 +88,7 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/dkrivoruchko/ScreenStream")
+                        Uri.parse("https://github.com/FihlaTV/QtuneCast")
                     ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
 
@@ -101,7 +101,7 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/dkrivoruchko/ScreenStream/blob/master/PrivacyPolicy.md")
+                        Uri.parse("https://github.com/FihlaTV/QtuneCast/blob/master/PrivacyPolicy.md")
                     ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
 
@@ -114,7 +114,7 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/dkrivoruchko/ScreenStream/blob/master/LICENSE")
+                        Uri.parse("https://github.com/FihlaTV/QtuneCast/blob/master/LICENSE")
                     ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
 

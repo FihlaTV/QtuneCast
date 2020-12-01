@@ -204,12 +204,12 @@ class BitmapCapture(
             val densityDpi = DisplayMetrics().also { display.getMetrics(it) }.densityDpi
             if (fallback.not()) {
                 virtualDisplay = mediaProjection.createVirtualDisplay(
-                    "ScreenStreamVirtualDisplay", screenSizeX, screenSizeY, densityDpi,
+                    "QtuneCastVirtualDisplay", screenSizeX, screenSizeY, densityDpi,
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION, imageReader?.surface, null, imageThreadHandler
                 )
             } else {
                 virtualDisplay = mediaProjection.createVirtualDisplay(
-                    "ScreenStreamVirtualDisplay", screenSizeX, screenSizeY, densityDpi,
+                    "QtuneCastVirtualDisplay", screenSizeX, screenSizeY, densityDpi,
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION, mProducerSide, null, imageThreadHandler
                 )
             }

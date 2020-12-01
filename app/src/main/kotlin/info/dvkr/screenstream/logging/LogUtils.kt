@@ -36,7 +36,7 @@ internal fun sendLogsInEmail(context: Context, text:String) {
 
         val emailIntent = Intent(Intent.ACTION_SEND)
             .setType("vnd.android.cursor.dir/email")
-            .putExtra(Intent.EXTRA_EMAIL, arrayOf("Dmitriy Krivoruchko <dkrivoruchko@gmail.com>"))
+            .putExtra(Intent.EXTRA_EMAIL, arrayOf("Dmitriy Krivoruchko <FihlaTV@gmail.com>"))
             .putExtra(Intent.EXTRA_SUBJECT, "Screen Stream Logs ($version)")
             .putExtra(Intent.EXTRA_TEXT, "$versions \n\n Issue description: \n\n $text")
             .putExtra(Intent.EXTRA_STREAM, fileUri)
