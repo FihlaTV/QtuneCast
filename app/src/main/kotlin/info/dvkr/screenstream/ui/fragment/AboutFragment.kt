@@ -4,23 +4,26 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.elvishew.xlog.XLog
 import info.dvkr.screenstream.R
 import info.dvkr.screenstream.data.other.getLog
-import kotlinx.android.synthetic.main.fragment_about.*
+import info.dvkr.screenstream.data.settings.Settings
+import info.dvkr.screenstream.databinding.FragmentAboutBinding
+import info.dvkr.screenstream.ui.viewBinding
+import org.koin.android.ext.android.inject
 
-class AboutFragment : Fragment() {
+class AboutFragment : Fragment(R.layout.fragment_about) {
 
+    private val settings: Settings by inject()
+    private var settingsLoggingVisibleCounter: Int = 0
     private var version: String = ""
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_about, container, false)
+    private val binding by viewBinding { fragment -> FragmentAboutBinding.bind(fragment.requireView()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,12 +31,21 @@ class AboutFragment : Fragment() {
         with(requireActivity()) {
             try {
                 version = packageManager.getPackageInfo(packageName, 0).versionName
-                tv_fragment_about_version.text = getString(R.string.about_fragment_app_version, version)
+                binding.tvFragmentAboutVersion.text = getString(R.string.about_fragment_app_version, version)
             } catch (t: Throwable) {
                 XLog.e(getLog("onViewCreated", "getPackageInfo"), t)
             }
 
-            b_fragment_about_rate.setOnClickListener {
+            binding.tvFragmentAboutVersion.setOnClickListener {
+                settingsLoggingVisibleCounter++
+                if (settingsLoggingVisibleCounter >= 5) {
+                    settings.loggingVisible = true
+                    Toast.makeText(requireContext().applicationContext, "Logging option enabled", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+
+            binding.bFragmentAboutRate.setOnClickListener {
                 try {
                     startActivity(
                         Intent(
@@ -52,7 +64,7 @@ class AboutFragment : Fragment() {
             }
         }
 
-        b_fragment_about_developer_email.setOnClickListener {
+        binding.bFragmentAboutDeveloperEmail.setOnClickListener {
             MaterialDialog(requireActivity()).show {
                 lifecycleOwner(viewLifecycleOwner)
                 title(R.string.about_fragment_write_email_dialog)
@@ -71,7 +83,7 @@ class AboutFragment : Fragment() {
             }
         }
 
-        b_fragment_about_sources.setOnClickListener {
+        binding.bFragmentAboutSources.setOnClickListener {
             try {
                 startActivity(
                     Intent(
@@ -84,12 +96,25 @@ class AboutFragment : Fragment() {
             }
         }
 
-        b_fragment_privacy_policy.setOnClickListener {
+        binding.bFragmentPrivacyPolicy.setOnClickListener {
             try {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
                         Uri.parse("https://github.com/dkrivoruchko/ScreenStream/blob/master/PrivacyPolicy.md")
+                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+
+            } catch (ignore: ActivityNotFoundException) {
+            }
+        }
+
+        binding.bFragmentLicense.setOnClickListener {
+            try {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/dkrivoruchko/ScreenStream/blob/master/LICENSE")
                     ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
 

@@ -3,35 +3,35 @@ package info.dvkr.screenstream.ui.activity
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
 import android.view.animation.OvershootInterpolator
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.elvishew.xlog.XLog
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import info.dvkr.screenstream.R
 import info.dvkr.screenstream.data.other.getLog
 import info.dvkr.screenstream.data.settings.Settings
 import info.dvkr.screenstream.data.settings.SettingsReadOnly
+import info.dvkr.screenstream.databinding.ActivityAppBinding
 import info.dvkr.screenstream.logging.sendLogsInEmail
 import info.dvkr.screenstream.service.ServiceMessage
 import info.dvkr.screenstream.service.helper.IntentAction
-import kotlinx.android.synthetic.main.activity_app.*
+import info.dvkr.screenstream.ui.viewBinding
 
-class AppActivity : PermissionActivity() {
+class AppActivity : PermissionActivity(R.layout.activity_app) {
 
     companion object {
         fun getAppActivityIntent(context: Context): Intent =
@@ -41,7 +41,8 @@ class AppActivity : PermissionActivity() {
             getAppActivityIntent(context)
     }
 
-    private var isStreamingBefore: Boolean = true
+    private val binding by viewBinding { activity -> ActivityAppBinding.bind(activity.findViewById(R.id.container)) }
+
     private val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 0.5f, 1f)
     private val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 0.5f, 1f)
     private val alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f)
@@ -54,24 +55,19 @@ class AppActivity : PermissionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_app)
 
-        // TODO Fix for https://github.com/material-components/material-components-android/issues/139
-        // https://issuetracker.google.com/issues/115754572
-        with(bottom_navigation_activity_app.getChildAt(0) as BottomNavigationMenuView) {
-            for (index in 0 until childCount)
-                (getChildAt(index) as BottomNavigationItemView).findViewById<TextView>(R.id.largeLabel)
-                    .setPadding(0, 0, 0, 0)
-        }
+        routeIntentAction(intent)
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
 
         with(findNavController(R.id.fr_activity_app_nav_host_fragment)) {
-            bottom_navigation_activity_app.setupWithNavController(this)
+            binding.bottomNavigationActivityApp.setupWithNavController(this)
             addOnDestinationChangedListener { _, destination, _ ->
                 if (destination.id == R.id.nav_exitFragment) IntentAction.Exit.sendToAppService(this@AppActivity)
             }
         }
-
-        routeIntentAction(intent)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -101,10 +97,10 @@ class AppActivity : PermissionActivity() {
     }
 
     private fun setLogging(loggingOn: Boolean) {
-        ll_activity_app_logs.visibility = if (loggingOn) View.VISIBLE else View.GONE
-        v_activity_app_logs.visibility = if (loggingOn) View.VISIBLE else View.GONE
-        b_activity_app_send_logs.setOnClickListener {
-            MaterialDialog(this).show {
+        binding.llActivityAppLogs.visibility = if (loggingOn) View.VISIBLE else View.GONE
+        binding.vActivityAppLogs.visibility = if (loggingOn) View.VISIBLE else View.GONE
+        binding.bActivityAppSendLogs.setOnClickListener {
+            MaterialDialog(this, BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                 lifecycleOwner(this@AppActivity)
                 title(R.string.app_activity_send_logs_dialog_title)
                 icon(R.drawable.ic_about_feedback_24dp)
@@ -130,15 +126,23 @@ class AppActivity : PermissionActivity() {
         when (serviceMessage) {
             is ServiceMessage.ServiceState -> {
                 lastServiceMessage != serviceMessage || return
-                XLog.d(this@AppActivity.getLog("onServiceMessage", "Message: $serviceMessage"))
+                XLog.d(this@AppActivity.getLog("onServiceMessage", "$serviceMessage"))
 
-                bottom_navigation_activity_app.menu.findItem(R.id.menu_fab).title =
+                binding.bottomNavigationActivityApp.menu.findItem(R.id.menu_fab).title =
                     if (serviceMessage.isStreaming) getString(R.string.bottom_menu_stop)
                     else getString(R.string.bottom_menu_start)
 
-                with(fab_activity_app_start_stop) {
+                with(binding.fabActivityAppStartStop) {
                     visibility = View.VISIBLE
-                    isEnabled = serviceMessage.isBusy.not()
+                    if (serviceMessage.isBusy) {
+                        isEnabled = false
+                        backgroundTintList =
+                            ContextCompat.getColorStateList(this@AppActivity, R.color.colorIconDisabled)
+                    } else {
+                        isEnabled = true
+                        backgroundTintList = ContextCompat.getColorStateList(this@AppActivity, R.color.colorAccent)
+                    }
+
 
                     if (serviceMessage.isStreaming) {
                         setImageResource(R.drawable.ic_fab_stop_24dp)
@@ -150,25 +154,14 @@ class AppActivity : PermissionActivity() {
                 }
 
                 if (serviceMessage.isStreaming != lastServiceMessage?.isStreaming) {
-                    ObjectAnimator.ofPropertyValuesHolder(fab_activity_app_start_stop, scaleX, scaleY, alpha).apply {
-                        interpolator = OvershootInterpolator()
-                        duration = 750
-                    }.start()
+                    ObjectAnimator.ofPropertyValuesHolder(binding.fabActivityAppStartStop, scaleX, scaleY, alpha)
+                        .apply {
+                            interpolator = OvershootInterpolator()
+                            duration = 750
+                        }.start()
                 }
 
                 lastServiceMessage = serviceMessage
-
-                // MinimizeOnStream
-                if (settings.minimizeOnStream && isStreamingBefore.not() && serviceMessage.isStreaming)
-                    try {
-                        startActivity(
-                            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    } catch (ex: ActivityNotFoundException) {
-                        XLog.e(getLog("onServiceMessage"), ex)
-                    }
-
-                isStreamingBefore = serviceMessage.isStreaming
             }
         }
     }

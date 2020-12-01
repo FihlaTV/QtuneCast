@@ -5,7 +5,6 @@ import androidx.annotation.MainThread
 
 interface SettingsReadOnly {
     val nightMode: Int
-    val minimizeOnStream: Boolean
     val stopOnSleep: Boolean
     val startOnBoot: Boolean
     val autoStartStop: Boolean
@@ -23,6 +22,7 @@ interface SettingsReadOnly {
     val jpegQuality: Int
     val resizeFactor: Int
     val rotation: Int
+    val maxFPS: Int
 
     val enablePin: Boolean
     val hidePinOnStart: Boolean
@@ -32,7 +32,10 @@ interface SettingsReadOnly {
 
     val useWiFiOnly: Boolean
     val enableIPv6: Boolean
+    val enableLocalHost: Boolean
+    val localHostOnly: Boolean
     val severPort: Int
+    val loggingVisible: Boolean
     val loggingOn: Boolean
 
     val lastIAURequestTimeStamp: Long

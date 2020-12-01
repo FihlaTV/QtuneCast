@@ -1,9 +1,11 @@
 package info.dvkr.screenstream.data.state
 
 import android.content.Intent
-import androidx.annotation.AnyThread
 import info.dvkr.screenstream.data.model.AppError
+import info.dvkr.screenstream.data.model.HttpClient
 import info.dvkr.screenstream.data.model.NetInterface
+import info.dvkr.screenstream.data.model.TrafficPoint
+import kotlinx.coroutines.flow.StateFlow
 
 
 interface AppStateMachine {
@@ -16,7 +18,7 @@ interface AppStateMachine {
         object RequestPublicState : Event()
         object RecoverError : Event()
 
-        override fun toString(): String = this::class.java.simpleName
+        override fun toString(): String = javaClass.simpleName
     }
 
     sealed class Effect {
@@ -30,8 +32,9 @@ interface AppStateMachine {
         ) : Effect()
     }
 
+    val statisticFlow: StateFlow<Pair<List<HttpClient>, List<TrafficPoint>>>
+
     fun sendEvent(event: Event, timeout: Long = 0)
 
-    @AnyThread
-    fun destroy()
+    suspend fun destroy()
 }

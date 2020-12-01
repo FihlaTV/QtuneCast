@@ -3,6 +3,7 @@ package info.dvkr.screenstream.data.httpserver
 
 import io.netty.util.concurrent.FastThreadLocal
 import io.netty.util.concurrent.FastThreadLocalThread
+import kotlinx.coroutines.CancellationException
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -48,10 +49,11 @@ internal class HttpServerThreadFactory private constructor(
 
     private fun newThread(r: Runnable, name: String): Thread = FastThreadLocalThread(threadGroup, r, name)
 
-    private class DefaultRunnableDecorator internal constructor(private val r: Runnable) : Runnable {
+    private class DefaultRunnableDecorator constructor(private val r: Runnable) : Runnable {
         override fun run() {
             try {
                 r.run()
+            } catch (ignored: CancellationException) {
             } finally {
                 FastThreadLocal.removeAll()
             }

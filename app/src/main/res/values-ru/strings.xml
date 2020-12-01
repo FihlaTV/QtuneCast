@@ -70,8 +70,6 @@
     </string-array>
     <string name="pref_notification">Настройки уведомлений устройства</string>
     <string name="pref_notification_summary">Открыть настройки уведомлений системы</string>
-    <string name="pref_minimize_on_stream">Сворачивать при трансляции</string>
-    <string name="pref_minimise_on_stream_summary">Сворачивать приложение при начале трансляции</string>
     <string name="pref_stop_on_sleep">Останавливать при выключении</string>
     <string name="pref_stop_on_sleep_summary">Останавливать трансляцию, если выключится экран</string>
     <string name="pref_start_on_boot">Начинать при загрузке</string>
@@ -80,7 +78,6 @@
     <string name="pref_auto_start_stop_summary">Авто Старт/Стоп трансляции при подключении/отключении клиентов</string>
     <string name="pref_detect_slow_connections">Уведомлять о медленных соединениях</string>
     <string name="pref_detect_slow_connections_summary">Определять и уведомлять о медленных клиентах</string>
-    <string name="pref_settings_web_page">Веб-страница</string>
     <string name="pref_html_buttons">Включить кнопки веб-страницы</string>
     <string name="pref_html_buttons_summary">Показывать кнопки управления на веб-странице</string>
     <string name="pref_html_back_color">Цвет фона веб-страницы</string>
@@ -108,9 +105,12 @@
     <string name="pref_resize_dialog_result">Размер изображения: %1$dx%2$d</string>
     <string name="pref_rotate">Поворачивать по часовой стрелке</string>
     <string name="pref_rotate_summary">Поворачивать изображение перед отправкой</string>
+    <string name="pref_fps">Ограничить кадры в секунду</string>
+    <string name="pref_fps_summary">Установите максимальное количество кадров в секунду</string>
+    <string name="pref_fps_dialog">Установите максимальное количество кадров в секунду.\nЗначения: 1–60 (По умолчанию: 30)</string>
     <string name="pref_jpeg_quality">Качество JPEG</string>
     <string name="pref_jpeg_quality_summary">Установить качество JPEG</string>
-    <string name="pref_jpeg_quality_dialog">Установите качество сжатия JPEG.\nЗначения: 10–100\n(По умолчанию: 100)</string>
+    <string name="pref_jpeg_quality_dialog">Установите качество сжатия JPEG.\nЗначения: 10–100\n(По умолчанию: 80)</string>
     <string name="pref_settings_security">Безопасность</string>
     <string name="pref_enable_pin">Использовать PIN-код</string>
     <string name="pref_enable_pin_summary">Защитить доступ к трансляции PIN-кодом</string>
@@ -128,6 +128,10 @@
     <string name="pref_wifi_only_summary">Запускать сервер только на WiFi интерфейсе</string>
     <string name="pref_enable_ipv6">Включить поддержку IPv6</string>
     <string name="pref_enable_ipv6_summary">Запускать сервер и на IPv6 адресах</string>
+    <string name="pref_enable_localhost">Слушать local host</string>
+    <string name="pref_enable_localhost_summary">Запускать сервер и на local host адресах</string>
+    <string name="pref_localhost_only">Слушать только local host</string>
+    <string name="pref_localhost_only_summary">Запускать сервер только на local host адресах</string>
     <string name="pref_server_port">Порт сервера</string>
     <string name="pref_server_port_summary">Установить порт для входяших подключений</string>
     <string name="pref_server_port_dialog">Установите порт сервера для входящих подключений.\nЗначения: 1025–65535\n(По умолчанию: 8080)</string>
@@ -142,4 +146,5 @@
     <string name="about_fragment_email_chooser_header">Отправка письма…</string>
     <string name="about_fragment_app_sources">Исходный код приложения</string>
     <string name="about_fragment_privacy_policy">Политика приватности</string>
+    <string name="about_fragment_license">Лицензия</string>
 </resources>

@@ -1,7 +1,6 @@
 package info.dvkr.screenstream
 
 import android.app.Application
-import com.elvishew.xlog.XLog
 import com.elvishew.xlog.flattener.ClassicFlattener
 import com.elvishew.xlog.printer.file.FilePrinter
 import com.elvishew.xlog.printer.file.clean.FileLastModifiedCleanStrategy
@@ -13,6 +12,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 abstract class BaseApp : Application() {
 
@@ -31,16 +31,16 @@ abstract class BaseApp : Application() {
         super.onCreate()
 
         startKoin {
-            androidLogger()
+            androidLogger(Level.ERROR)
             androidContext(this@BaseApp)
             modules(baseKoinModule)
         }
 
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread: Thread, throwable: Throwable ->
-            XLog.e("Uncaught throwable in thread ${thread.name}", throwable)
-            defaultHandler?.uncaughtException(thread, throwable)
-        }
+//        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+//        Thread.setDefaultUncaughtExceptionHandler { thread: Thread, throwable: Throwable ->
+//            XLog.e("Uncaught throwable in thread ${thread.name}", throwable)
+//            defaultHandler?.uncaughtException(thread, throwable)
+//        }
 
         initLogger()
     }

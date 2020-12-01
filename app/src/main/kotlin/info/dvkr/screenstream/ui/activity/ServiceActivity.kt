@@ -3,12 +3,14 @@ package info.dvkr.screenstream.ui.activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
-import android.os.*
+import android.os.Bundle
+import android.os.IBinder
 import androidx.annotation.CallSuper
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.coroutineScope
 import com.elvishew.xlog.XLog
 import info.dvkr.screenstream.data.other.getLog
 import info.dvkr.screenstream.data.settings.Settings
@@ -16,66 +18,60 @@ import info.dvkr.screenstream.data.settings.SettingsReadOnly
 import info.dvkr.screenstream.service.AppService
 import info.dvkr.screenstream.service.ServiceMessage
 import info.dvkr.screenstream.service.helper.IntentAction
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
-abstract class ServiceActivity : AppUpdateActivity() {
+abstract class ServiceActivity(@LayoutRes contentLayoutId: Int) : AppUpdateActivity(contentLayoutId) {
 
-    private var serviceMessenger: Messenger? = null
+    private val serviceMessageLiveData = MutableLiveData<ServiceMessage>()
+    private var serviceMessageFlowJob: Job? = null
     private var isBound: Boolean = false
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder) {
-            serviceMessenger = Messenger(service)
+            XLog.d(this@ServiceActivity.getLog("onServiceConnected"))
+            serviceMessageFlowJob =
+                lifecycle.coroutineScope.launch(CoroutineName("ServiceActivity.ServiceMessageFlow")) {
+                    (service as AppService.AppServiceBinder).getServiceMessageFlow()
+                        .onEach { serviceMessage ->
+                            XLog.v(this@ServiceActivity.getLog("onServiceMessage", "$serviceMessage"))
+                            serviceMessageLiveData.value = serviceMessage
+                        }
+                        .catch { cause -> XLog.e(this@ServiceActivity.getLog("onServiceMessage"), cause) }
+                        .collect()
+                }
+
             isBound = true
-            sendMessage(ServiceMessage.RegisterActivity(activityMessenger))
             IntentAction.GetServiceState.sendToAppService(this@ServiceActivity)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
+            XLog.w(this@ServiceActivity.getLog("onServiceDisconnected"))
+            serviceMessageFlowJob?.cancel()
+            serviceMessageFlowJob = null
             isBound = false
-            serviceMessenger = null
         }
     }
 
-    fun sendMessage(serviceMessage: ServiceMessage) {
-        XLog.d(getLog("sendMessage", "ServiceMessage: $serviceMessage"))
-        isBound || return
-
-        try {
-            serviceMessenger?.send(Message.obtain(null, 0).apply { data = serviceMessage.toBundle() })
-        } catch (ex: RemoteException) {
-            XLog.w(getLog("sendMessage", ex.toString()))
-        }
-    }
-
-    private class ServiceMessagesHandler : Handler() {
-        private val serviceMessageLiveData = MutableLiveData<ServiceMessage>()
-
-        fun getServiceMessageLiveData(): LiveData<ServiceMessage> = serviceMessageLiveData
-
-        override fun handleMessage(msg: Message) {
-            serviceMessageLiveData.value = ServiceMessage.fromBundle(msg.data)
-        }
-    }
-
-    private val serviceMessagesHandler = ServiceMessagesHandler()
-    private val activityMessenger = Messenger(serviceMessagesHandler)
     private val settingsListener = object : SettingsReadOnly.OnSettingsChangeListener {
         override fun onSettingsChanged(key: String) {
-            if (key == Settings.Key.NIGHT_MODE) setNightMode(settings.nightMode)
+            if (key == Settings.Key.NIGHT_MODE) AppCompatDelegate.setDefaultNightMode(settings.nightMode)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setNightMode(settings.nightMode)
+        AppCompatDelegate.setDefaultNightMode(settings.nightMode)
+
         super.onCreate(savedInstanceState)
     }
 
     override fun onStart() {
         super.onStart()
-        serviceMessagesHandler.getServiceMessageLiveData().observe(this, Observer<ServiceMessage> { message ->
-            message?.let { onServiceMessage(it) }
-        })
-
+        serviceMessageLiveData.observe(this, { message -> message?.let { onServiceMessage(it) } })
         bindService(AppService.getAppServiceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
 
         settings.registerChangeListener(settingsListener)
@@ -88,7 +84,8 @@ abstract class ServiceActivity : AppUpdateActivity() {
 
     override fun onStop() {
         if (isBound) {
-            sendMessage(ServiceMessage.UnRegisterActivity(activityMessenger))
+            serviceMessageFlowJob?.cancel()
+            serviceMessageFlowJob = null
             unbindService(serviceConnection)
             isBound = false
         }
@@ -100,17 +97,9 @@ abstract class ServiceActivity : AppUpdateActivity() {
     @CallSuper
     open fun onServiceMessage(serviceMessage: ServiceMessage) {
         when (serviceMessage) {
-            ServiceMessage.FinishActivity -> {
-                finishAndRemoveTask()
-                Runtime.getRuntime().exit(0)
-            }
+            ServiceMessage.FinishActivity -> finishAndRemoveTask()
         }
     }
 
-    fun getServiceMessageLiveData() = serviceMessagesHandler.getServiceMessageLiveData()
-
-    private fun setNightMode(@AppCompatDelegate.NightMode nightMode: Int) {
-        AppCompatDelegate.setDefaultNightMode(nightMode)
-        delegate.setLocalNightMode(nightMode)
-    }
+    fun getServiceMessageLiveData(): LiveData<ServiceMessage> = serviceMessageLiveData
 }

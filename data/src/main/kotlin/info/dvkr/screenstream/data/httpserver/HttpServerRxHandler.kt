@@ -1,11 +1,12 @@
 package info.dvkr.screenstream.data.httpserver
 
+import android.graphics.Bitmap
 import com.elvishew.xlog.XLog
 import com.jakewharton.rxrelay.BehaviorRelay
-import info.dvkr.screenstream.data.model.AppError
 import info.dvkr.screenstream.data.other.asString
 import info.dvkr.screenstream.data.other.getLog
 import info.dvkr.screenstream.data.other.randomString
+import info.dvkr.screenstream.data.settings.SettingsReadOnly
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.handler.codec.http.HttpHeaderNames
@@ -16,31 +17,28 @@ import io.reactivex.netty.protocol.http.server.HttpServerRequest
 import io.reactivex.netty.protocol.http.server.HttpServerResponse
 import io.reactivex.netty.protocol.http.server.RequestHandler
 import io.reactivex.netty.threads.RxJavaEventloopScheduler
-import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import rx.BackpressureOverflow
 import rx.Observable
-import rx.functions.Action0
+import java.io.ByteArrayOutputStream
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicReference
 
 internal class HttpServerRxHandler(
+    coroutineScope: CoroutineScope,
     private val serverAddresses: List<InetAddress>,
     private val httpServerFiles: HttpServerFiles,
     private val onStartStopRequest: () -> Unit,
-    private val onStatisticEvent: (HttpServerStatistic.StatisticEvent) -> Unit,
-    jpegBytesChannel: ReceiveChannel<ByteArray>,
-    onError: (AppError) -> Unit
-) : HttpServerCoroutineScope(onError), RequestHandler<ByteBuf, ByteBuf> {
-
-    private val indexHtml: String
-    private val streamAddress: String
-    private val startStopAddress: String
-    private val htmlEnableButtons: Boolean
-    private val pinEnabled: Boolean
-    private val pinAddress: String
-    private val pinRequestHtml: String
-    private val pinRequestErrorHtml: String
+    private val clientStatistic: ClientStatistic,
+    private val settingsReadOnly: SettingsReadOnly,
+    private val bitmapStateFlow: StateFlow<Bitmap>
+) : RequestHandler<ByteBuf, ByteBuf> {
 
     private val crlf = "\r\n".toByteArray()
     private val multipartBoundary = randomString(20)
@@ -48,30 +46,27 @@ internal class HttpServerRxHandler(
     private val jpegBaseHeader = "Content-Type: image/jpeg\r\nContent-Length: ".toByteArray()
 
     private val jpegBytesStream = BehaviorRelay.create<ByteArray>()
+    private val jpegStillImg: AtomicReference<ByteArray> = AtomicReference(ByteArray(0))
+
     private val eventloopScheduler = RxJavaEventloopScheduler(RxNetty.getRxEventLoopProvider().globalClientEventLoop())
 
     init {
         XLog.d(getLog("init", "Invoked"))
 
-        httpServerFiles.prepareForConfigure().apply {
-            htmlEnableButtons = first
-            pinEnabled = second
-        }
+        httpServerFiles.configure()
 
-        streamAddress = httpServerFiles.configureStreamAddress()
-        startStopAddress = httpServerFiles.configureStartStopAddress()
-        indexHtml = httpServerFiles.configureIndexHtml(streamAddress, startStopAddress)
-        pinAddress = httpServerFiles.configurePinAddress()
-        pinRequestHtml = httpServerFiles.configurePinRequestHtml()
-        pinRequestErrorHtml = httpServerFiles.configurePinRequestErrorHtml()
-
-        launch {
-            for (jpegBytes in jpegBytesChannel) {
+        val resultJpegStream = ByteArrayOutputStream()
+        coroutineScope.launch {
+            bitmapStateFlow.onEach { bitmap ->
+                resultJpegStream.reset()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, settingsReadOnly.jpegQuality, resultJpegStream)
+                ensureActive()
+                val jpegBytes = resultJpegStream.toByteArray().also { jpegStillImg.set(it) }
                 val jpegLength = jpegBytes.size.toString().toByteArray()
                 jpegBytesStream.call(
                     Unpooled.copiedBuffer(jpegBaseHeader, jpegLength, crlf, crlf, jpegBytes, crlf, jpegBoundary).array()
                 )
-            }
+            }.collect()
         }
     }
 
@@ -87,16 +82,29 @@ internal class HttpServerRxHandler(
         XLog.d(getLog("handle", "Request to: ${localAddress.asString()}$uri from ${clientAddress.asString()}"))
 
         return when {
-            uri == HttpServerFiles.ICON_PNG_ADDRESS -> response.sendPng(httpServerFiles.faviconPng)
-            uri == HttpServerFiles.LOGO_PNG_ADDRESS -> response.sendPng(httpServerFiles.logoPng)
-            uri == HttpServerFiles.FULLSCREEN_ON_PNG_ADDRESS -> response.sendPng(httpServerFiles.fullScreenOnPng)
-            uri == HttpServerFiles.FULLSCREEN_OFF_PNG_ADDRESS -> response.sendPng(httpServerFiles.fullScreenOffPng)
-            uri == HttpServerFiles.START_STOP_PNG_ADDRESS -> response.sendPng(httpServerFiles.startStopPng)
-            uri == startStopAddress && htmlEnableButtons -> onStartStopRequest().run { response.sendHtml(indexHtml) }
-            uri == HttpServerFiles.DEFAULT_HTML_ADDRESS -> response.sendHtml(if (pinEnabled) pinRequestHtml else indexHtml)
-            uri == pinAddress && pinEnabled -> response.sendHtml(indexHtml)
-            uri.startsWith(HttpServerFiles.DEFAULT_PIN_ADDRESS) && pinEnabled -> response.sendHtml(pinRequestErrorHtml)
-            uri == streamAddress -> sendStream(response)
+            uri == HttpServerFiles.ROOT_ADDRESS + HttpServerFiles.FAVICON_PNG -> response.sendPng(httpServerFiles.faviconPng)
+            uri == HttpServerFiles.ROOT_ADDRESS + HttpServerFiles.LOGO_PNG -> response.sendPng(httpServerFiles.logoPng)
+            uri == HttpServerFiles.ROOT_ADDRESS + HttpServerFiles.FULLSCREEN_ON_PNG -> response.sendPng(httpServerFiles.fullscreenOnPng)
+            uri == HttpServerFiles.ROOT_ADDRESS + HttpServerFiles.FULLSCREEN_OFF_PNG -> response.sendPng(httpServerFiles.fullscreenOffPng)
+            uri == HttpServerFiles.ROOT_ADDRESS + HttpServerFiles.START_STOP_PNG -> response.sendPng(httpServerFiles.startStopPng)
+
+            uri == HttpServerFiles.ROOT_ADDRESS + HttpServerFiles.START_STOP_ADDRESS && httpServerFiles.htmlEnableButtons ->
+                onStartStopRequest().run { response.sendHtml(httpServerFiles.indexHtml) }
+
+            uri == HttpServerFiles.ROOT_ADDRESS ->
+                response.sendHtml(if (httpServerFiles.enablePin) httpServerFiles.pinRequestHtml else httpServerFiles.indexHtml)
+
+            uri == "${HttpServerFiles.ROOT_ADDRESS}?pin=${httpServerFiles.pin}" && httpServerFiles.enablePin ->
+                response.sendHtml(httpServerFiles.indexHtml)
+
+            uri.startsWith("${HttpServerFiles.ROOT_ADDRESS}?pin=") && httpServerFiles.enablePin ->
+                response.sendHtml(httpServerFiles.pinRequestErrorHtml)
+
+            uri == HttpServerFiles.ROOT_ADDRESS + httpServerFiles.streamAddress -> sendStream(response)
+
+            uri.startsWith(HttpServerFiles.ROOT_ADDRESS + httpServerFiles.jpegFallbackAddress) ->
+                response.sendJpeg(jpegStillImg.get())
+
             else -> response.redirect(request.hostHeader)
         }
     }
@@ -105,6 +113,7 @@ internal class HttpServerRxHandler(
         status = HttpResponseStatus.OK
         addHeader(HttpHeaderNames.CONTENT_TYPE, "image/png")
         setHeader(HttpHeaderNames.CACHE_CONTROL, "no-cache,no-store,max-age=0,must-revalidate")
+        setHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
         setHeader(HttpHeaderNames.CONTENT_LENGTH, pngBytes.size.toString())
         setHeader(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE)
         return writeBytesAndFlushOnEach(Observable.just(pngBytes))
@@ -114,6 +123,7 @@ internal class HttpServerRxHandler(
         status = HttpResponseStatus.OK
         addHeader(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8")
         setHeader(HttpHeaderNames.CACHE_CONTROL, "no-cache,no-store,max-age=0,must-revalidate")
+        setHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
         setHeader(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE)
         return writeStringAndFlushOnEach(Observable.just(html))
     }
@@ -122,14 +132,19 @@ internal class HttpServerRxHandler(
         val channel = response.unsafeConnection().channelPipeline.channel()
         val clientAddress = channel.remoteAddress() as InetSocketAddress
 
-        onStatisticEvent(HttpServerStatistic.StatisticEvent.Connected(clientAddress))
+        clientStatistic.sendEvent(
+            ClientStatistic.StatisticEvent.Connected(
+                clientAddress.hashCode().toLong(), clientAddress.asString()
+            )
+        )
         channel.closeFuture().addListener {
-            onStatisticEvent(HttpServerStatistic.StatisticEvent.Disconnected(clientAddress))
+            clientStatistic.sendEvent(ClientStatistic.StatisticEvent.Disconnected(clientAddress.hashCode().toLong()))
         }
 
         response.status = HttpResponseStatus.OK
         response.setHeader(HttpHeaderNames.CONTENT_TYPE, "multipart/x-mixed-replace;boundary=$multipartBoundary")
         response.setHeader(HttpHeaderNames.CACHE_CONTROL, "no-cache,no-store,max-age=0,must-revalidate")
+        response.setHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
         response.setHeader(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
 
         return response.writeBytesAndFlushOnEach(
@@ -137,15 +152,31 @@ internal class HttpServerRxHandler(
                 .observeOn(eventloopScheduler)
                 .onBackpressureBuffer(
                     2,
-                    Action0 { onStatisticEvent(HttpServerStatistic.StatisticEvent.Backpressure(clientAddress)) },
+                    {
+                        clientStatistic.sendEvent(
+                            ClientStatistic.StatisticEvent.Backpressure(clientAddress.hashCode().toLong())
+                        )
+                    },
                     BackpressureOverflow.ON_OVERFLOW_DROP_OLDEST
                 )
                 .doOnNext { jpegBytes ->
-                    onStatisticEvent(HttpServerStatistic.StatisticEvent.NextBytes(clientAddress, jpegBytes.size))
+                    clientStatistic.sendEvent(
+                        ClientStatistic.StatisticEvent.NextBytes(clientAddress.hashCode().toLong(), jpegBytes.size)
+                    )
                 }
                 // Sending boundary so browser can understand that previous image was fully send
                 .startWith(Unpooled.copiedBuffer(jpegBoundary, jpegBytesStream.value).array())
         )
+    }
+
+    private fun HttpServerResponse<ByteBuf>.sendJpeg(jpegBytes: ByteArray): Observable<Void> {
+        status = HttpResponseStatus.OK
+        addHeader(HttpHeaderNames.CONTENT_TYPE, "image/jpeg")
+        setHeader(HttpHeaderNames.CACHE_CONTROL, "no-cache,no-store,max-age=0,must-revalidate")
+        setHeader(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+        setHeader(HttpHeaderNames.CONTENT_LENGTH, jpegBytes.size.toString())
+        setHeader(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE)
+        return writeBytesAndFlushOnEach(Observable.just(jpegBytes))
     }
 
     private fun HttpServerResponse<ByteBuf>.redirect(serverAddress: String): Observable<Void> {
@@ -154,6 +185,6 @@ internal class HttpServerRxHandler(
         addHeader(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8")
         setHeader(HttpHeaderNames.CACHE_CONTROL, "no-cache,no-store,max-age=0,must-revalidate")
         setHeader(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE)
-        return Observable.empty<Void>()
+        return Observable.empty()
     }
 }

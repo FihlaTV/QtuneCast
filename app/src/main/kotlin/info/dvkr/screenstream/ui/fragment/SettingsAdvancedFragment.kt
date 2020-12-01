@@ -3,14 +3,14 @@ package info.dvkr.screenstream.ui.fragment
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
@@ -19,46 +19,77 @@ import info.dvkr.screenstream.R
 import info.dvkr.screenstream.data.other.getLog
 import info.dvkr.screenstream.data.settings.Settings
 import info.dvkr.screenstream.data.settings.SettingsReadOnly
+import info.dvkr.screenstream.databinding.FragmentSettingsAdvancedBinding
 import info.dvkr.screenstream.logging.cleanLogFiles
-import kotlinx.android.synthetic.main.fragment_settings_advanced.*
+import info.dvkr.screenstream.ui.enableDisableViewWithChildren
+import info.dvkr.screenstream.ui.viewBinding
 import org.koin.android.ext.android.inject
 
-class SettingsAdvancedFragment : Fragment() {
+class SettingsAdvancedFragment : Fragment(R.layout.fragment_settings_advanced) {
 
     private val settings: Settings by inject()
     private val settingsListener = object : SettingsReadOnly.OnSettingsChangeListener {
         override fun onSettingsChanged(key: String) = when (key) {
             Settings.Key.SERVER_PORT ->
-                tv_fragment_settings_server_port_value.text = settings.severPort.toString()
+                binding.tvFragmentSettingsServerPortValue.text = settings.severPort.toString()
 
             else -> Unit
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_settings_advanced, container, false)
+    private val binding by viewBinding { fragment -> FragmentSettingsAdvancedBinding.bind(fragment.requireView()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Advanced - Use WiFi Only
-        with(cb_fragment_settings_use_wifi_only) {
+        with(binding.cbFragmentSettingsUseWifiOnly) {
             isChecked = settings.useWiFiOnly
+            binding.clFragmentSettingsUseWifiOnly.enableDisableViewWithChildren(
+                (settings.enableLocalHost && settings.localHostOnly).not()
+            )
             setOnClickListener { settings.useWiFiOnly = isChecked }
-            cl_fragment_settings_use_wifi_only.setOnClickListener { performClick() }
+            binding.clFragmentSettingsUseWifiOnly.setOnClickListener { performClick() }
         }
 
         // Advanced - Enable IPv6 support
-        with(cb_fragment_settings_enable_ipv6) {
+        with(binding.cbFragmentSettingsEnableIpv6) {
             isChecked = settings.enableIPv6
             setOnClickListener { settings.enableIPv6 = isChecked }
-            cl_fragment_settings_enable_ipv6.setOnClickListener { performClick() }
+            binding.clFragmentSettingsEnableIpv6.setOnClickListener { performClick() }
+        }
+
+        // Advanced - Enable Local host
+        with(binding.cbFragmentSettingsEnableLocalhost) {
+            isChecked = settings.enableLocalHost
+            binding.clFragmentSettingsLocalhostOnly.enableDisableViewWithChildren(settings.enableLocalHost)
+            setOnClickListener {
+                settings.enableLocalHost = isChecked
+                binding.clFragmentSettingsLocalhostOnly.enableDisableViewWithChildren(settings.enableLocalHost)
+                binding.clFragmentSettingsUseWifiOnly.enableDisableViewWithChildren(
+                    (settings.enableLocalHost && settings.localHostOnly).not()
+                )
+            }
+            binding.clFragmentSettingsEnableLocalhost.setOnClickListener { performClick() }
+        }
+
+        // Advanced - Local host only
+        with(binding.cbFragmentSettingsLocalhostOnly) {
+            isChecked = settings.localHostOnly
+            binding.clFragmentSettingsLocalhostOnly.enableDisableViewWithChildren(settings.enableLocalHost)
+            setOnClickListener {
+                settings.localHostOnly = isChecked
+                binding.clFragmentSettingsUseWifiOnly.enableDisableViewWithChildren(
+                    (settings.enableLocalHost && settings.localHostOnly).not()
+                )
+            }
+            binding.clFragmentSettingsLocalhostOnly.setOnClickListener { performClick() }
         }
 
         // Advanced - Server port
-        tv_fragment_settings_server_port_value.text = settings.severPort.toString()
-        cl_fragment_settings_server_port.setOnClickListener {
-            MaterialDialog(requireActivity()).show {
+        binding.tvFragmentSettingsServerPortValue.text = settings.severPort.toString()
+        binding.clFragmentSettingsServerPort.setOnClickListener {
+            MaterialDialog(requireActivity(), BottomSheet(LayoutMode.WRAP_CONTENT)).show {
                 lifecycleOwner(viewLifecycleOwner)
                 title(R.string.pref_server_port)
                 icon(R.drawable.ic_settings_http_24dp)
@@ -83,13 +114,15 @@ class SettingsAdvancedFragment : Fragment() {
         }
 
         // Advanced - Enable application logs
-        with(cb_fragment_settings_logging) {
+        binding.vFragmentSettingsLogging.visibility = if (settings.loggingVisible) View.VISIBLE else View.GONE
+        binding.clFragmentSettingsLogging.visibility = if (settings.loggingVisible) View.VISIBLE else View.GONE
+        with(binding.cbFragmentSettingsLogging) {
             isChecked = settings.loggingOn
             setOnClickListener {
                 settings.loggingOn = isChecked
                 if (settings.loggingOn.not()) cleanLogFiles(requireContext().applicationContext)
             }
-            cl_fragment_settings_logging.setOnClickListener { performClick() }
+            binding.clFragmentSettingsLogging.setOnClickListener { performClick() }
         }
     }
 

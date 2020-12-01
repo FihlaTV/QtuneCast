@@ -2,24 +2,15 @@ package info.dvkr.screenstream.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import com.elvishew.xlog.XLog
 import info.dvkr.screenstream.data.other.getLog
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
-abstract class BaseActivity : AppCompatActivity(), CoroutineScope {
-
-    private val supervisorJob = SupervisorJob()
-
-    override val coroutineContext: CoroutineContext
-        get() = supervisorJob + Dispatchers.Main + CoroutineExceptionHandler { _, throwable ->
-            XLog.e(getLog("onCoroutineException"), throwable)
-        }
-
+abstract class BaseActivity(@LayoutRes contentLayoutId: Int) : AppCompatActivity(contentLayoutId) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        XLog.v(getLog("onCreate", "Invoked"))
+        XLog.d(getLog("onCreate", "Invoked"))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -29,27 +20,26 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onStart() {
         super.onStart()
-        XLog.v(getLog("onStart", "Invoked"))
+        XLog.d(getLog("onStart", "Invoked"))
     }
 
     override fun onResume() {
         super.onResume()
-        XLog.v(getLog("onResume", "Invoked"))
+        XLog.d(getLog("onResume", "Invoked"))
     }
 
     override fun onPause() {
-        XLog.v(getLog("onPause", "Invoked"))
+        XLog.d(getLog("onPause", "Invoked"))
         super.onPause()
     }
 
     override fun onStop() {
-        XLog.v(getLog("onStop", "Invoked"))
+        XLog.d(getLog("onStop", "Invoked"))
         super.onStop()
     }
 
     override fun onDestroy() {
-        XLog.v(getLog("onDestroy", "Invoked"))
-        supervisorJob.cancelChildren()
+        XLog.d(getLog("onDestroy", "Invoked"))
         super.onDestroy()
     }
 }

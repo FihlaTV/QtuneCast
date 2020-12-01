@@ -15,9 +15,6 @@ class SettingsImpl(private val preferences: Preferences) : Settings {
     override var nightMode: Int
             by bindPreference(preferences, Settings.Key.NIGHT_MODE, Settings.Default.NIGHT_MODE)
 
-    override var minimizeOnStream: Boolean
-            by bindPreference(preferences, Settings.Key.MINIMIZE_ON_STREAM, Settings.Default.MINIMIZE_ON_STREAM)
-
     override var stopOnSleep: Boolean
             by bindPreference(preferences, Settings.Key.STOP_ON_SLEEP, Settings.Default.STOP_ON_SLEEP)
 
@@ -65,6 +62,9 @@ class SettingsImpl(private val preferences: Preferences) : Settings {
     override var rotation: Int
             by bindPreference(preferences, Settings.Key.ROTATION, Settings.Default.ROTATION)
 
+    override var maxFPS: Int
+            by bindPreference(preferences, Settings.Key.MAX_FPS, Settings.Default.MAX_FPS)
+
 
     override var enablePin: Boolean
             by bindPreference(preferences, Settings.Key.ENABLE_PIN, Settings.Default.ENABLE_PIN)
@@ -87,8 +87,17 @@ class SettingsImpl(private val preferences: Preferences) : Settings {
     override var enableIPv6: Boolean
             by bindPreference(preferences, Settings.Key.ENABLE_IPV6, Settings.Default.ENABLE_IPV6)
 
+    override var enableLocalHost: Boolean
+            by bindPreference(preferences, Settings.Key.ENABLE_LOCAL_HOST, Settings.Default.ENABLE_LOCAL_HOST)
+
+    override var localHostOnly: Boolean
+            by bindPreference(preferences, Settings.Key.LOCAL_HOST_ONLY, Settings.Default.LOCAL_HOST_ONLY)
+
     override var severPort: Int
             by bindPreference(preferences, Settings.Key.SERVER_PORT, Settings.Default.SERVER_PORT)
+
+    override var loggingVisible: Boolean
+            by bindPreference(preferences, Settings.Key.LOGGING_VISIBLE, Settings.Default.LOGGING_VISIBLE)
 
     override var loggingOn: Boolean
             by bindPreference(preferences, Settings.Key.LOGGING_ON, Settings.Default.LOGGING_ON)

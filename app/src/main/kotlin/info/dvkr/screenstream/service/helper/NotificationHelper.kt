@@ -31,6 +31,7 @@ class NotificationHelper(context: Context) {
     private var currentNotificationType: NotificationType? = null
 
     fun createNotificationChannel() {
+        currentNotificationType = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.deleteNotificationChannel("info.dvkr.screenstream.service.NOTIFICATION_CHANNEL_01")
             notificationManager.createNotificationChannel(
@@ -66,7 +67,6 @@ class NotificationHelper(context: Context) {
 
     fun showForegroundNotification(service: Service, notificationType: NotificationType) {
         if (currentNotificationType != notificationType) {
-            service.stopForeground(true)
             service.startForeground(notificationType.id, getForegroundNotification(notificationType))
             currentNotificationType = notificationType
         }

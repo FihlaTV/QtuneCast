@@ -45,8 +45,6 @@
     <string name="toast_slow_client_connection">偵測到用戶端網路速度不佳</string>
 
     <string name="pref_settings_interface">界面</string>
-    <string name="pref_minimize_on_stream">串流時最小化</string>
-    <string name="pref_minimise_on_stream_summary">在串流時最小化app到通知列</string>
     <string name="pref_stop_on_sleep">睡眠時停止</string>
     <string name="pref_stop_on_sleep_summary">當螢幕待機關閉時停止串流</string>
     <string name="pref_start_on_boot">開機時啟動</string>
@@ -61,7 +59,7 @@
     <string name="pref_resize_dialog_result">畫面大小 size： %1$dx%2$d</string>
     <string name="pref_jpeg_quality">JPEG壓縮品質</string>
     <string name="pref_jpeg_quality_summary">設定JPEG壓縮品質</string>
-    <string name="pref_jpeg_quality_dialog">設定JPEG壓縮品質。\n範圍： 10–100 (Default： 100)</string>
+    <string name="pref_jpeg_quality_dialog">設定JPEG壓縮品質。\n範圍： 10–100 (Default： 80)</string>
     <string name="pref_settings_security">安全性</string>
     <string name="pref_enable_pin">使用pin</string>
     <string name="pref_enable_pin_summary">需輸入pin以進入被保護的串流</string>

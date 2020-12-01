@@ -12,6 +12,10 @@
     <string name="app_activity_send_logs_dialog_message">Bitte fügen Sie eine Fehlerbeschreibung hinzu:</string>
     <string name="app_activity_send_logs_dialog_neutral">Log-Aufzeichnung stoppen</string>
 
+    <string name="app_update_activity_dialog_title">Update verfügbar</string>
+    <string name="app_update_activity_dialog_message">Eine Update wurde soeben heruntergeladen. App neu starten?</string>
+    <string name="app_update_activity_dialog_restart">Neu starten</string>
+
     <string name="bottom_menu_stream">Streamen</string>
     <string name="bottom_menu_settings">Einstellungen</string>
     <string name="bottom_menu_start">Starten</string>
@@ -61,13 +65,11 @@
     </string-array>
     <string-array name="pref_night_mode_options_api29">
         <item>Immer</item>
-        <item>Automatisch (system folgen)</item>
+        <item>Automatisch (System folgen)</item>
         <item>Nie</item>
     </string-array>
     <string name="pref_notification">Einstellungen für Benachrichtigungen</string>
     <string name="pref_notification_summary">Systemeinstellungen für Benachrichtigungen öffnen</string>
-    <string name="pref_minimize_on_stream">Beim Start des Streams minimieren</string>
-    <string name="pref_minimise_on_stream_summary">App beim Stream-Start minimieren</string>
     <string name="pref_stop_on_sleep">Stream im Standby-Modus stoppen</string>
     <string name="pref_stop_on_sleep_summary">Stream stoppen, wenn der Bildschirm ausgeschaltet wird</string>
     <string name="pref_start_on_boot">Stream beim Gerätestart starten</string>
@@ -76,14 +78,13 @@
     <string name="pref_auto_start_stop_summary">Stream automatisch starten/stoppen wenn sich ein Gerät mit dem Stream verbindet/trennt</string>
     <string name="pref_detect_slow_connections">Benachrichtigung bei schlechter Verbindung</string>
     <string name="pref_detect_slow_connections_summary">Schlechte Verbindung von Geräten erkennen und diese benachrichtigen</string>
-    <string name="pref_settings_web_page">Webseite</string>
     <string name="pref_html_buttons">Schaltflächen auf Webseite anzeigen</string>
     <string name="pref_html_buttons_summary">Kontoll-Schaltflächen auf der Webseite anzeigen/verstecken</string>
     <string name="pref_html_back_color">Hintergrundfarbe der Webseite</string>
     <string name="pref_html_back_color_summary">Hintergrundfarbe der Webseite setzen</string>
     <string name="pref_html_back_color_title">Hintergrundfarbe wählen</string>
     <string name="pref_settings_image">Bild</string>
-    <string name="pref_vr_mode">Virtuelle-Realität-Modus</string>
+    <string name="pref_vr_mode">Modus für virtuelle Realität</string>
     <string name="pref_vr_mode_summary">Erfassen von Inhalten vom halben Bildschirm</string>
     <string-array name="pref_vr_mode_options" translatable="false">
         <item>Verwendung des linken Teils</item>
@@ -104,9 +105,12 @@
     <string name="pref_resize_dialog_result">Bildgröße: %1$dx%2$d</string>
     <string name="pref_rotate">Bild im Uhrzeigersinn drehen</string>
     <string name="pref_rotate_summary">Bild vor dem Senden drehen</string>
+    <string name="pref_fps">Bilder pro Sekunde begrenzen</string>
+    <string name="pref_fps_summary">Maximale Bilder pro Sekunde festlegen</string>
+    <string name="pref_fps_dialog">Maximale Bilder pro Sekunde festlegen.\nWerte: 1–60 (Standard: 30)</string>
     <string name="pref_jpeg_quality">JPEG-Kompressionsqualität</string>
-    <string name="pref_jpeg_quality_summary">JPEG-Kompressionsqualität setzen</string>
-    <string name="pref_jpeg_quality_dialog">JPEG-Kompressionsqualität setzen.\nWerte: 10–100 (Standard: 100)</string>
+    <string name="pref_jpeg_quality_summary">JPEG-Kompressionsqualität festlegen</string>
+    <string name="pref_jpeg_quality_dialog">JPEG-Kompressionsqualität festlegen.\nMögliche Werte: 10–100 (Standard: 80)</string>
     <string name="pref_settings_security">Sicherheit</string>
     <string name="pref_enable_pin">PIN aktivieren</string>
     <string name="pref_enable_pin_summary">Zugriff auf dem Stream mit PIN schützen</string>
@@ -124,6 +128,8 @@
     <string name="pref_wifi_only_summary">Server nur über WLAN-Schnittstelle verwenden </string>
     <string name="pref_enable_ipv6">IPv6 Unterstützung aktivieren</string>
     <string name="pref_enable_ipv6_summary">Server auch auf IPv6 Adressen starten</string>
+    <string name="pref_enable_localhost">Localhost aktivieren</string>
+    <string name="pref_enable_localhost_summary">Server auch auf localhost Adressen starten</string>
     <string name="pref_server_port">Server-Port</string>
     <string name="pref_server_port_summary">Port für eingehende Verbindungen setzen</string>
     <string name="pref_server_port_dialog">Port für eingehende Verbindungen setzen.\nWerte: 1025–65535\n(Standard: 8080)</string>

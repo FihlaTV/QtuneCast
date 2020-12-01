@@ -20,32 +20,26 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-#Firebase https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
+-allowaccessmodification
+-repackageclasses
+
 -keepnames class info.dvkr.screenstream.** { *; }
 
 #Crashlytics
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
--keep public class * extends java.lang.Exception
+-keep class com.google.firebase.crashlytics.** { *; }
 
--keep class com.crashlytics.** { *; }
--dontwarn com.crashlytics.**
-
-# Coroutines
-# ServiceLoader support
--keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
--keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
-# Most of volatile fields are updated with AFU and should not be mangled
--keepclassmembernames class kotlinx.** {
-    volatile <fields>;
-}
+#KTOR
+#-keep class io.ktor.application.Application
+#-keep class kotlin.reflect.jvm.internal.**
+#-keep class kotlin.text.RegexOption
 
 # Netty
--dontwarn io.netty.**
--keepnames class io.netty.** { *;}
-
-# SLF4J
--dontwarn org.slf4j.**
+#-keep class io.ktor.server.netty.EngineMain
+-keepattributes Signature,InnerClasses
+-keepclasseswithmembers class io.netty.** { *; }
+-keepnames class io.netty.** { *; }
 
 # RxJava
 -dontwarn sun.misc.**

@@ -59,13 +59,10 @@
         <item>Automaticamente (segui il sistema)</item>
         <item>Mai</item>
     </string-array>
-    <string name="pref_minimize_on_stream">Riduci alla trasmissione</string>
-    <string name="pref_minimise_on_stream_summary">Riduci l\'app quando trasmetti</string>
     <string name="pref_stop_on_sleep">Interrompi a schermo spento</string>
     <string name="pref_stop_on_sleep_summary">Interrompi la trasmissione quando lo schermo si spegne</string>
     <string name="pref_start_on_boot">Esegui all\'avvio</string>
     <string name="pref_start_on_boot_summary">Avvia la trasmissione quando accendi il dispositivo</string>
-    <string name="pref_settings_web_page">La pagina web</string>
     <string name="pref_html_buttons">Abilita i pulsanti della pagina Web</string>
     <string name="pref_html_buttons_summary">Mostra pulsanti di controllo sulla pagina web</string>
     <string name="pref_html_back_color">Colore di sfondo pagina</string>
@@ -80,7 +77,7 @@
     <string name="pref_rotate_summary">Ruota l\'immagine prima di inviarla al client</string>
     <string name="pref_jpeg_quality">Qualità di compressione JPEG</string>
     <string name="pref_jpeg_quality_summary">Imposta la qualità di compressione JPEG</string>
-    <string name="pref_jpeg_quality_dialog">Imposta la qualità di compressione JPEG. Valori: 10–100 (predefinito: 100)</string>
+    <string name="pref_jpeg_quality_dialog">Imposta la qualità di compressione JPEG. Valori: 10–100 (predefinito: 80)</string>
     <string name="pref_settings_security">Sicurezza</string>
     <string name="pref_enable_pin">Attiva pin</string>
     <string name="pref_enable_pin_summary">Proteggi l\'accesso alla trasmissione con un pin</string>

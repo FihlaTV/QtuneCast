@@ -6,7 +6,6 @@ interface Settings : SettingsReadOnly {
 
     object Key {
         const val NIGHT_MODE = "PREF_KEY_NIGHT_MODE_V2"
-        const val MINIMIZE_ON_STREAM = "PREF_KEY_MINIMIZE_ON_STREAM"
         const val STOP_ON_SLEEP = "PREF_KEY_STOP_ON_SLEEP"
         const val START_ON_BOOT = "PREF_KEY_START_ON_BOOT"
         const val AUTO_START_STOP = "PREF_KEY_AUTO_START_STOP"
@@ -24,6 +23,7 @@ interface Settings : SettingsReadOnly {
         const val JPEG_QUALITY = "PREF_KEY_JPEG_QUALITY"
         const val RESIZE_FACTOR = "PREF_KEY_RESIZE_FACTOR"
         const val ROTATION = "PREF_KEY_ROTATION"
+        const val MAX_FPS = "PREF_KEY_MAX_FPS_2"
 
         const val ENABLE_PIN = "PREF_KEY_ENABLE_PIN"
         const val HIDE_PIN_ON_START = "PREF_KEY_HIDE_PIN_ON_START"
@@ -33,7 +33,10 @@ interface Settings : SettingsReadOnly {
 
         const val USE_WIFI_ONLY = "PREF_KEY_USE_WIFI_ONLY"
         const val ENABLE_IPV6 = "PREF_KEY_ENABLE_IPV6"
+        const val ENABLE_LOCAL_HOST = "PREF_KEY_ENABLE_LOCAL_HOST"
+        const val LOCAL_HOST_ONLY = "PREF_KEY_LOCAL_HOST_ONLY"
         const val SERVER_PORT = "PREF_KEY_SERVER_PORT"
+        const val LOGGING_VISIBLE = "PREF_KEY_LOGGING_VISIBLE"
         const val LOGGING_ON = "PREF_KEY_LOGGING_ON"
 
         const val LAST_IAU_REQUEST_TIMESTAMP = "PREF_KEY_LAST_IAU_REQUEST_TIMESTAMP"
@@ -41,7 +44,6 @@ interface Settings : SettingsReadOnly {
 
     object Default {
         var NIGHT_MODE = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) 3 else -1
-        const val MINIMIZE_ON_STREAM = true
         const val STOP_ON_SLEEP = false
         const val START_ON_BOOT = false
         const val AUTO_START_STOP = false
@@ -61,6 +63,7 @@ interface Settings : SettingsReadOnly {
         const val JPEG_QUALITY = 80
         const val RESIZE_FACTOR = 50
         const val ROTATION = Values.ROTATION_0
+        const val MAX_FPS = 30
 
         const val ENABLE_PIN = false
         const val HIDE_PIN_ON_START = true
@@ -70,7 +73,10 @@ interface Settings : SettingsReadOnly {
 
         const val USE_WIFI_ONLY = true
         const val ENABLE_IPV6 = false
+        const val ENABLE_LOCAL_HOST = false
+        const val LOCAL_HOST_ONLY = false
         const val SERVER_PORT = 8080
+        const val LOGGING_VISIBLE = false
         const val LOGGING_ON = false
 
         const val LAST_IAU_REQUEST_TIMESTAMP = 0L
@@ -86,7 +92,6 @@ interface Settings : SettingsReadOnly {
     }
 
     override var nightMode: Int
-    override var minimizeOnStream: Boolean
     override var stopOnSleep: Boolean
     override var startOnBoot: Boolean
     override var autoStartStop: Boolean
@@ -104,6 +109,7 @@ interface Settings : SettingsReadOnly {
     override var jpegQuality: Int
     override var resizeFactor: Int
     override var rotation: Int
+    override var maxFPS: Int
 
     override var enablePin: Boolean
     override var hidePinOnStart: Boolean
@@ -113,7 +119,10 @@ interface Settings : SettingsReadOnly {
 
     override var useWiFiOnly: Boolean
     override var enableIPv6: Boolean
+    override var enableLocalHost: Boolean
+    override var localHostOnly: Boolean
     override var severPort: Int
+    override var loggingVisible: Boolean
     override var loggingOn: Boolean
 
     override var lastIAURequestTimeStamp: Long
