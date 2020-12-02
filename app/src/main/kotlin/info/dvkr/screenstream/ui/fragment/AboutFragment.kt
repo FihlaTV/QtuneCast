@@ -74,8 +74,8 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
                     val emailIntent = Intent(Intent.ACTION_SENDTO)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setData(Uri.Builder().scheme("mailto").build())
-                        .putExtra(Intent.EXTRA_EMAIL, arrayOf("Dmitriy Krivoruchko <FihlaTV@gmail.com>"))
-                        .putExtra(Intent.EXTRA_SUBJECT, "Screen Stream Feedback ($version)")
+                        .putExtra(Intent.EXTRA_EMAIL, arrayOf("Thomas Fihla <FihlaTV@gmail.com>"))
+                        .putExtra(Intent.EXTRA_SUBJECT, "QtuneCast Feedback ($version)")
                     startActivity(
                         Intent.createChooser(emailIntent, getString(R.string.about_fragment_email_chooser_header))
                     )
